@@ -8,10 +8,11 @@
             <thead>
                 <tr>
                     <th>id</th>
-                    <th>title</th>
+                    <th>titolo</th>
                     <th>contenuto</th>
                     <th>slug</th>
                     <th>tipologia</th>
+                    <th>tecnologie</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
@@ -23,6 +24,13 @@
                         <td>{{ $item->content }}</td>
                         <td>{{ $item->slug }}</td>
                         <td>{{ $item->type->name }}</td>
+                        <td>
+                            <ul>
+                                @foreach ($item->technologies as $tech)
+                                    <li>{{ $tech->name }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
                         <td>
                             <div class="d-flex flex-column gap-2">
                                 <a href="{{ route('admin.posts.edit', ['post' => $item->slug]) }}">
