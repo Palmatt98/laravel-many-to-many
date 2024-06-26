@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -25,7 +26,8 @@ class PostController extends Controller
     public function create()
     {
         $types = Type::all();
-        return view('admin.posts.create', compact('types'));
+        $technologies = Technology::all();
+        return view('admin.posts.create', compact('types', 'technologies'));
 
     }
 
@@ -41,7 +43,13 @@ class PostController extends Controller
         $newPost->content = $data["content"];
         $newPost->slug = Str::slug($newPost->title);
         $newPost->type_id = $data["type"];
+
         $newPost->save();
+
+        if (!empty($data["technologies"])) {
+            $newPost->technologies()->attach($data["technologies"]);
+        }
+
         return redirect()->route('admin.posts.show', ['post' => $newPost->slug]);
 
     }
@@ -61,7 +69,8 @@ class PostController extends Controller
     {
         $post = Post::where('slug', $slug)->firstOrFail();
         $types = Type::all();
-        return view('admin.posts.edit', compact('post', 'types'));
+        $technologies = Technology::all();
+        return view('admin.posts.edit', compact('post', 'types', 'technologies'));
         //SELECT * FROM posts WHERE posts.slug = "POTATO"
     }
 
@@ -79,6 +88,12 @@ class PostController extends Controller
         $post->type_id = $data["type"];
 
         $post->save();
+
+        $post->technologies()->detach();
+
+        if (!empty($data["technologies"])) {
+            $post->technologies()->attach($data["technologies"]);
+        }
 
         return redirect()->route('admin.posts.index');
     }
